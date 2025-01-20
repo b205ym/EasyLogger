@@ -35,6 +35,8 @@
 
 #include "elog_file.h"
 
+#ifdef ELOG_FILE_ENABLE
+
 /* initialize OK flag */
 static bool init_ok = false;
 static FILE *fp = NULL;
@@ -69,7 +71,7 @@ static bool elog_file_rotate(void)
 #define SUFFIX_LEN                     10
     /* mv xxx.log.n-1 => xxx.log.n, and xxx.log => xxx.log.0 */
     int n, err = 0;
-    char oldpath[256], newpath[256];
+    char oldpath[256]= {0}, newpath[256] = {0};
     size_t base = strlen(local_cfg.name);
     bool result = true;
     FILE *tmp_fp;
@@ -113,6 +115,9 @@ void elog_file_write(const char *log, size_t size)
 
     ELOG_ASSERT(init_ok);
     ELOG_ASSERT(log);
+    if(fp == NULL) {
+    	return;
+    }
 
     elog_file_port_lock();
 
@@ -172,3 +177,5 @@ void elog_file_config(ElogFileCfg *cfg)
 
     elog_file_port_unlock();
 }
+
+#endif /* ELOG_FILE_ENABLE */
